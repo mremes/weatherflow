@@ -5,6 +5,7 @@ import com.google.cloud.dataflow.sdk.options.Description;
 import com.google.cloud.dataflow.sdk.options.PipelineOptions;
 import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
+import com.google.cloud.dataflow.sdk.transforms.PTransform;
 import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import com.google.cloud.dataflow.sdk.io.BigQueryIO;
 import com.google.cloud.dataflow.sdk.io.PubsubIO;
@@ -23,7 +24,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 public class StarterPipeline {
-	static class StringToRawTableRow extends DoFn<String,TableRow> {
+
+	static class StringToRawTableRowFn extends DoFn<String,TableRow> {
 		@Override
 		public void processElement(ProcessContext c) throws Exception {
 			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").print(DateTime.now());
@@ -33,13 +35,24 @@ public class StarterPipeline {
 		}
 	}
 
-	static class SplitInputString extends DoFn<String,String> {
+	static class SplitInputStringFn extends DoFn<String,String> {
 		@Override
 		public void processElement(ProcessContext c) throws Exception {
 			for(String s : c.element().split("\n")) {
 				c.output(s);
 			}
 		}
+	}
+
+	static class InputToTableRows extends PTransform<PCollection<String>,PCollection<TableRow>> {
+		@Override
+        public PCollection<TableRow> apply(PCollection<String> input) {
+            PCollection<String> lines = input.apply(ParDo.of(new SplitInputStringFn()));
+
+            PCollection<TableRow> rows = lines.apply(ParDo.of(new StringToRawTableRowFn()));
+
+            return rows;
+        }
 	}
 
 	private static TableSchema getTableSchema() {
@@ -67,8 +80,7 @@ public class StarterPipeline {
 				.Read
 				.named("ReadFromPubSub")
 				.subscription(pubSubSubscription))
-		.apply(ParDo.of(new SplitInputString()))
-		.apply(ParDo.of(new StringToRawTableRow()))
+		.apply(new InputToTableRows())
 		.apply(BigQueryIO.Write
 				.named("WriteToBigQuery")
 				.to(String.format("%s:%s.raw", options.getProjectName(), options.getDataSet()))
