@@ -27,10 +27,9 @@ pubsub_topic = pubsub_client.topic(topic_name)
 
 if __name__ == '__main__':
 	cities = ['Helsinki','Tampere','Oulu','Turku','Jyvaeskylae',
-			  'Lahti','Kuopio','Kouvola','Pori','Joensuu',
-              'Rovaniemi','Utsjoki','Kajaani','Vaasa','Mikkeli',
-              'Vaalimaa','Lappeenranta','Kuusamo','Saariselkae',
-              'Kittilae']
+		'Lahti','Kuopio','Kouvola','Pori','Joensuu',
+		'Rovaniemi','Utsjoki','Kajaani','Vaasa','Mikkeli',
+		'Vaalimaa','Lappeenranta','Kuusamo','Saariselkae','Kittilae']
 	base_url = 'http://api.wunderground.com/api/{}/conditions/q/Finland/'
 	call_url = base_url.format(api_key)
 	req_urls = {city : call_url + city + '.json' for city in cities}
