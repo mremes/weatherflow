@@ -4,7 +4,7 @@ This project is a data pipeline – from data fetching to loading to a data ware
 This project uses a simple Python script for calling a [Wunderground Weather API](https://www.wunderground.com/weather/api/d/docs?MR=1) and posting payload into a GCP's [Pub/Sub](https://cloud.google.com/pubsub/docs/) messaging broker for a [Google Dataflow](https://cloud.google.com/dataflow/docs/) job to consume. The Dataflow job then writes processed data into a BigQuery table (in a raw format, for now).
 
 Right now project consists of:
-- `api_fetcher/main.py` - Python script for fetching data from Wunderground Weather API
+- `api_fetcher/main.py` - Python script for fetching data from Wunderground Weather API and sending paylaod into a Pub/Sub topic
 - `dataflow` - Dataflow jobs
 - Google Cloud Platform services: [Pub/Sub](https://cloud.google.com/pubsub/docs/) for messaging and  [BigQuery](https://cloud.google.com/bigquery/docs/) to store the pipeline output
 
