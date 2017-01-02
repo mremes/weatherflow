@@ -23,24 +23,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 public class StarterPipeline {
-	public interface CustomOptions extends PipelineOptions {
-		@Description("Target dataset in BigQuery.")
-		String getDataSet();
-		void setDataSet(String dataSet);
-
-		@Description("Name of subscription to read data from.")
-		String getSubscription();
-		void setSubscription(String subscription);
-
-		@Description("Project id in Google Cloud for subscription path.")
-		String getProjectId();
-		void setProjectId(String projectId);
-
-		@Description("Project name in Google Cloud under which dataset is created.")
-		String getProjectName();
-		void setProjectName(String projectName);
-	}
-
 	static class StringToRawTableRow extends DoFn<String,TableRow> {
 		@Override
 		public void processElement(ProcessContext c) throws Exception {
@@ -69,11 +51,11 @@ public class StarterPipeline {
   }
 
 	public static void main(String[] args) {
-		PipelineOptionsFactory.register(CustomOptions.class);
-		CustomOptions options = PipelineOptionsFactory.fromArgs(args)
+		PipelineOptionsFactory.register(BasicOptions.class);
+		BasicOptions options = PipelineOptionsFactory.fromArgs(args)
 			.withValidation()
 			.create()
-			.as(CustomOptions.class);
+			.as(BasicOptions.class);
 
 		Pipeline p = Pipeline.create(options);
 		TableSchema schema = getTableSchema();
