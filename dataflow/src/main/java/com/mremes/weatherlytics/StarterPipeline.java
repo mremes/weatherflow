@@ -77,11 +77,12 @@ public class StarterPipeline {
 		Pipeline p = Pipeline.create(options);
 		TableSchema schema = getTableSchema();
 
-        String projectId = (String) options.getProjectId();
-        String subscription = (String) options.getSubscription();
+        String projectId = options.getProjectId();
+        String projectFormat = String.format("projects/%s",projectId);
+        String subscription = options.getSubscription();
+        String subscriptionFormat = String.format("/subscriptions/%s",subscription);
 
-        String pubSubSubscription = String.format(
-				"projects/%s/subscriptions/%s", "analytics-sandbox1", "weatherflow-finland");
+        String pubSubSubscription = projectFormat + subscriptionFormat;
         p.apply(PubsubIO
 				.Read
 				.named("ReadFromPubSub")

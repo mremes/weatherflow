@@ -27,8 +27,10 @@ python main.py <wunderground_api_key> <pubsub_topic>
 Inside the `dataflow` directory:
 ```
 mvn compile exec:java -Dexec.mainClass=com.mremes.weatherlytics.StarterPipeline \
--Dexec.args="--dataSet=<bigquery_data_set> \
+-Dexec.args="--dataSet=<bq_data_set> \
 --subscription=<pubsub_subscription> \
 --projectName=<project_name> \
 --projectId=<project_id>"
+--stagingLocation=<gcs_staging_location> \
+--tempLocation=<gcs_temp_location>
 ```
