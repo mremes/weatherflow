@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 3:
 	print 'ERROR: Wrong number of args.\n'
 	usage = 'Usage: python main.py <api_key> <pubsub_topic>\n\n' \
 	'Parameters:\n' \
@@ -18,7 +18,7 @@ import logging
 
 from google.cloud import pubsub
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=10)
 
 api_key = sys.argv[1]
 pubsub_client = pubsub.Client()
@@ -51,6 +51,6 @@ if __name__ == '__main__':
 				counter = 0
 			time.sleep(2)
 		msg_id = pubsub_topic.publish(topic_payload.encode('utf-8'))
-		logging.debug('Sent batch to topic {}, message id: {}'.format(topic_name, msd_id))
+		logging.debug('Sent batch to topic {}, message id: {}'.format(topic_name, msg_id))
 		logging.debug('Done batch querying data from API. Sleeping for 3600s.')
 		time.sleep(3600)
