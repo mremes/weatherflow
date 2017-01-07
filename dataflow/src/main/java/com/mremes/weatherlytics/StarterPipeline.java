@@ -9,6 +9,9 @@ import com.google.cloud.dataflow.sdk.transforms.PTransform;
 import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import com.google.cloud.dataflow.sdk.io.BigQueryIO;
 import com.google.cloud.dataflow.sdk.io.PubsubIO;
+import com.google.cloud.dataflow.sdk.transforms.Sum;
+import com.google.cloud.dataflow.sdk.transforms.windowing.FixedWindows;
+import com.google.cloud.dataflow.sdk.transforms.windowing.Window;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableRow;
@@ -17,6 +20,7 @@ import com.google.api.services.bigquery.model.TableSchema;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,14 +77,18 @@ public class StarterPipeline {
 		Pipeline p = Pipeline.create(options);
 		TableSchema schema = getTableSchema();
 
-		String pubSubSubscription = String.format(
-				"projects/%s/subscriptions/%s", options.getProjectId(), options.getSubscription());
+        String projectId = (String) options.getProjectId();
+        String subscription = (String) options.getSubscription();
 
-		p.apply(PubsubIO
+        String pubSubSubscription = String.format(
+				"projects/%s/subscriptions/%s", "analytics-sandbox1", "weatherflow-finland");
+        p.apply(PubsubIO
 				.Read
 				.named("ReadFromPubSub")
-				.subscription(pubSubSubscription))
+				.subscription(pubSubSubscription)
+                .maxNumRecords(1))
 		.apply(new InputToTableRows())
+        .apply(Window.into(FixedWindows.of(Duration.standardHours(1))))
 		.apply(BigQueryIO.Write
 				.named("WriteToBigQuery")
 				.to(String.format("%s:%s.raw", options.getProjectName(), options.getDataSet()))
